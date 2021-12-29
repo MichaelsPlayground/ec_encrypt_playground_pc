@@ -29,37 +29,40 @@ in AndroidManifest.xml ergänzen:
 ```    
 
 ```plaintext
------BEGIN PRIVATE KEY-----
-
------END PRIVATE KEY-----
+-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEICuBx3EABrYE2PS1PjVI8AUlgLo6P1HW9DN3JpZp8vGQoAoGCCqGSM49
+AwEHoUQDQgAEaxfR8uEsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpZP40Li/hp/
+m47n60p8D54WK84zV2sxXs7LtkBoN79R9Q==
+-----END EC PRIVATE KEY-----
 ```
 
 ```plaintext
------BEGIN PUBLIC KEY-----
-
------END PUBLIC KEY-----
+-----BEGIN EC PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAESYkCeCKg/FUxlAehp/Oo6rp528TU
+yK/p2To10FhCiIRuq4ZHq/3FVoqOlECkhgfMsxjOyGh9Wb+tv+tZEs5CRQ==
+-----END EC PUBLIC KEY-----
 ```
 
 Klartext:
 ```plaintext
-The quick brown fox jumps over the lazy dog
+Meine geheime Nachricht
 ```
 
-Sample RSA PSS signature:
+Sample ECDSA SHA-256 signature:
 ```plaintext
 {
-  "algorithm": "RSA-2048 PSS",
-  "plaintext": "VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw==",
-  "signature": "3oUlHXG8Yd9Ew1ByxVfi20Kez6JI/cZ4HjhiB3bBYihrPRpfmwy7pVmhz+4lM8KvEoO+7mnLiF/F2/7+z/UOdqoT35Axry6eHzo8IxHZAxWbO84UV0pbNtJ0PYfXT5fx4Pc47M5AogjBy452ct5MujsM8/Vq+Zc0fbVCsYDgQslmjl0HZK3I4XDuMKRn5Td4WZA9ojmHySJXs3yAibYt9O41jGp1np/PqMzkUPjm/F7O9YrP+xZ+xX0YdAUJ+KXRO+/fxTi9/U3WRsou7WJt7kQNRoMfhHH6UOKVLQu67g1X/tN3fy43rKg7ZfG1k0PBJh032NoHbpi7Nx8FirVqNg=="
+  "algorithm": "ECDSA P256 SHA256",
+  "plaintext": "TWVpbmUgZ2VoZWltZSBOYWNocmljaHQ=",
+  "signature": "XZvsbEIpNKQYx0TDZQOyl8PR0817uos6bEUihSAU8IWQ5hsB2AfH/sWGIVEiDG/AZOU3E/KAKrPlS6WcEOe0ow=="
 }
 ```
 
-Sample PKCS 1.5 signature:
+Sample ECDSA SHA-1 signature:
 ```plaintext
 {
-  "algorithm": "RSA-2048 PKCS 1.5",
-  "plaintext": "VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw==",
-  "signature": "abTQ5OdbJlzEz59/sagMjYhXXNZbEX6QJk/Thw8BrFjbTIwvluM/nwiOAN3Kx10p0mlbhVd4iMmN8L+0EPmN0y35/cVTs7Mp7h2QqHWiGMhgf9o/7/oi1Os6/zLPn/UyhpxtGPRUzcj92HrhM804pvAkpq85LcZOkSWyyL8KWnlJL7a6HyAugez+bJFiTAu5woTs3nXTk8GpGGVRwDyB49pYCRBk3G9oym0k8Hur2NthavWjg1xEgN48EGWNKih0uIvFvHBAwyEUpqqrgMVBCjx51caeXma/ID8pvFEgxZXDro7h39xnxLKXHrmWV9Sd6WheolmjbizLvw0b0yp6gw=="
+  "algorithm": "ECDSA P256 SHA1",
+  "plaintext": "TWVpbmUgZ2VoZWltZSBOYWNocmljaHQ=",
+  "signature": "iNsDwFzpU6C8c6eX79SIdSOvOChRyJ3bBRsLSNMA6lAUQAAAtnbNYLhmjFw+JBND+nc/ofryltRQikWMUNf9dw=="
 }
 ```
 
