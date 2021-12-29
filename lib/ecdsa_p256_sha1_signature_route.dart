@@ -3,18 +3,19 @@ import 'dart:convert';
 import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'storage.dart';
 
-class EcdsaP256Sha256SignatureVerificationRoute extends StatefulWidget {
-  const EcdsaP256Sha256SignatureVerificationRoute({Key? key}) : super(key: key);
+class EcdsaP256Sha1SignatureRoute extends StatefulWidget {
+  const EcdsaP256Sha1SignatureRoute({Key? key}) : super(key: key);
 
-  final String title = 'ECDSA P256 SHA256 Verifikation';
+  final String title = 'ECDSA P256 SHA1 Signatur';
 
   @override
   _MyFormPageState createState() => _MyFormPageState();
 }
 
-class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> {
+class _MyFormPageState extends State<EcdsaP256Sha1SignatureRoute> {
   @override
   void initState() {
     super.initState();
@@ -23,24 +24,40 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> 
 
   final _formKey = GlobalKey<FormState>();
   TextEditingController descriptionController = TextEditingController();
-  TextEditingController ciphertextController = TextEditingController();
-  TextEditingController publicKeyController = TextEditingController();
+
+  // the following controller have a default value
+  TextEditingController plaintextController = TextEditingController(
+      text: 'The quick brown fox jumps over the lazy dog');
+  TextEditingController privateKeyController = TextEditingController();
   TextEditingController outputController = TextEditingController();
-  TextEditingController signatureVerificationController =
-  TextEditingController();
 
-  String txtDescription =
-      'ECDSA P256 Verifikation einer Unterschrift mit SHA-256 hashing.'
-      ' Der öffentliche Schlüssel ist im PEM PKCS#8 Format.';
+  String txtDescription = 'ECDSA P256 Signatur mit SHA-1 Hashing.'
+      ' Der private Schlüssel ist im PEM PKCS#8 Format.';
 
-  Future<bool> _fileExistsPublicKey() async {
+  String _returnJson(String data) {
+    var parts = data.split(':');
+    var algorithm = parts[0];
+    var plaintext = parts[1];
+    var signature = parts[2];
+
+    JsonAsymmetricSignature jsonAsymmetricSignature = JsonAsymmetricSignature(
+        algorithm: algorithm, plaintext: plaintext, signature: signature);
+
+    String encryptionResult = jsonEncode(jsonAsymmetricSignature);
+    // make it pretty
+    var object = json.decode(encryptionResult);
+    var prettyEncryptionResult2 = JsonEncoder.withIndent('  ').convert(object);
+    return prettyEncryptionResult2;
+  }
+
+  Future<bool> _fileExistsPrivateKey() async {
     bool ergebnis = false;
-    await Storage().filePublicKeyExists().then((bool value) {
+    await Storage().filePrivateKeyExists().then((bool value) {
       setState(() {
         if (value == true) {
-          publicKeyController.text = 'Datei existiert ';
+          privateKeyController.text = 'Datei existiert ';
         } else {
-          publicKeyController.text = 'Datei existiert NICHT';
+          privateKeyController.text = 'Datei existiert NICHT';
         }
         ergebnis = value;
       });
@@ -48,10 +65,10 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> 
     return ergebnis;
   }
 
-  Future<void> _readDataPublicKey() async {
-    Storage().readDataPublicKey().then((String value) {
+  Future<void> _readDataPrivateKey() async {
+    Storage().readDataPrivateKey().then((String value) {
       setState(() {
-        publicKeyController.text = value;
+        privateKeyController.text = value;
       });
     });
   }
@@ -70,13 +87,15 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> 
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
+                //SizedBox(height: 20),
                 // form description
                 TextFormField(
                   controller: descriptionController,
                   keyboardType: TextInputType.text,
                   autocorrect: false,
                   enabled: false,
-                  maxLines: 3,
+                  // false = disabled, true = enabled
+                  maxLines: 4,
                   decoration: InputDecoration(
                     labelText: 'Beschreibung',
                     border: OutlineInputBorder(),
@@ -84,16 +103,23 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> 
                 ),
 
                 SizedBox(height: 20),
-                // signatur
+                // plaintext
                 TextFormField(
-                  controller: ciphertextController,
-                  maxLines: 15,
-                  maxLength: 700,
+                  controller: plaintextController,
+                  maxLines: 3,
+                  maxLength: 100,
+                  keyboardType: TextInputType.multiline,
+                  autocorrect: false,
                   decoration: InputDecoration(
-                    labelText: 'Signatur',
-                    hintText: 'kopieren Sie den signierten Text in dieses Feld',
+                    labelText: 'Klartext',
                     border: OutlineInputBorder(),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Bitte Daten eingeben';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: 10),
                 Row(
@@ -104,7 +130,7 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> 
                           primary: Colors.grey,
                           textStyle: TextStyle(color: Colors.white)),
                       onPressed: () {
-                        ciphertextController.text = '';
+                        plaintextController.text = '';
                       },
                       child: Text('Feld löschen'),
                     ),
@@ -117,7 +143,7 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> 
                         onPressed: () async {
                           final data =
                           await Clipboard.getData(Clipboard.kTextPlain);
-                          ciphertextController.text = data!.text!;
+                          plaintextController.text = data!.text!;
                         },
                         child: Text('aus Zwischenablage einfügen'),
                       ),
@@ -126,16 +152,16 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> 
                 ),
 
                 SizedBox(height: 20),
-                // public key
+                // private key
                 TextFormField(
-                  controller: publicKeyController,
+                  controller: privateKeyController,
                   maxLines: 4,
-                  maxLength: 500,
+                  maxLength: 2000,
                   keyboardType: TextInputType.multiline,
                   autocorrect: false,
-                  //enabled: false,
+                  // enabled: false,
                   decoration: InputDecoration(
-                    labelText: 'Öffentlicher Schlüssel',
+                    labelText: 'Privater Schlüssel',
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
@@ -158,7 +184,7 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> 
                         onPressed: () async {
                           final data =
                           await Clipboard.getData(Clipboard.kTextPlain);
-                          publicKeyController.text = data!.text!;
+                          privateKeyController.text = data!.text!;
                         },
                         child: Text('Schlüssel aus Zwischenablage einfügen'),
                       ),
@@ -170,16 +196,14 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            primary: Colors.grey,
-                            textStyle: TextStyle(color: Colors.white)),
-                        onPressed: () {
-                          publicKeyController.text = '';
-                        },
-                        child: Text('Feld löschen'),
-                      ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          primary: Colors.grey,
+                          textStyle: TextStyle(color: Colors.white)),
+                      onPressed: () {
+                        privateKeyController.text = '';
+                      },
+                      child: Text('Feld löschen'),
                     ),
                     SizedBox(width: 15),
                     Expanded(
@@ -188,10 +212,10 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> 
                             primary: Colors.blue,
                             textStyle: TextStyle(color: Colors.white)),
                         onPressed: () async {
-                          bool pubKeyFileExists =
-                          await _fileExistsPublicKey() as bool;
-                          if (pubKeyFileExists) {
-                            await _readDataPublicKey();
+                          bool priKeyFileExists =
+                          await _fileExistsPrivateKey() as bool;
+                          if (priKeyFileExists) {
+                            await _readDataPrivateKey();
                           }
                         },
                         child: Text('lokal laden'),
@@ -210,99 +234,59 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> 
                             primary: Colors.grey,
                             textStyle: TextStyle(color: Colors.white)),
                         onPressed: () {
-                          //_formKey.currentState!.reset();
-                          ciphertextController.text = '';
-                          publicKeyController.text = '';
+                          plaintextController.text = '';
+                          privateKeyController.text = '';
+                          outputController.text = '';
                         },
                         child: Text('Formulardaten löschen'),
                       ),
                     ),
                     SizedBox(width: 25),
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            primary: Colors.blue,
-                            textStyle: TextStyle(color: Colors.white)),
-                        onPressed: () async {
-                          // Wenn alle Validatoren der Felder des Formulars gültig sind.
-                          if (_formKey.currentState!.validate()) {
-                            String jsonAsymmetricSignature =
-                                ciphertextController.text;
-                            String publicKeyPem = publicKeyController.text;
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          primary: Colors.blue,
+                          textStyle: TextStyle(color: Colors.white)),
+                      onPressed: () async {
+                        // Wenn alle Validatoren der Felder des Formulars gültig sind.
+                        if (_formKey.currentState!.validate()) {
+                          String plaintext = plaintextController.text;
+                          String privateKeyPem = privateKeyController.text;
 
-                            String algorithm = '';
-                            String plaintextBase64 = '';
-                            String signatureBase64 = '';
-                            try {
-                              final parsedJson =
-                              json.decode(jsonAsymmetricSignature);
-                              algorithm = parsedJson['algorithm'];
-                              plaintextBase64 = parsedJson['plaintext'];
-                              signatureBase64 = parsedJson['signature'];
-                            } on FormatException catch (e) {
-                              outputController.text =
-                              'Fehler: Die Eingabe sieht nicht nach einem Json-Datensatz aus.';
-                              return;
-                            } on NoSuchMethodError catch (e) {
-                              outputController.text =
-                              'Fehler: Die Eingabe ist ungültig.';
-                              return;
-                            }
-                            if (algorithm != 'ECDSA P256 SHA256') {
-                              outputController.text =
-                              'Fehler: es handelt sich nicht um einen Datensatz, der mit ECDSA P256 SHA-256 signiert worden ist.';
-                              return;
-                            }
-                            String verificationtext = '';
-                            try {
-                              ECPublicKey ecPublicKey = CryptoUtils.ecPublicKeyFromPem(publicKeyPem);
-                              Uint8List messageByte = base64Decoding(plaintextBase64);
-                              bool signatureVerified = ecVerifySignatureFromBase64(ecPublicKey, messageByte, signatureBase64);
-                              if (signatureVerified == true) {
-                                verificationtext = 'Die Signatur ist RICHTIG';
-                              } else {
-                                verificationtext = 'Die Signatur ist FALSCH';
-                              }
-                            } catch (error) {
-                              signatureVerificationController.text =
-                              'Die Signatur ist FALSCH';
-                              return;
-                            }
-                            signatureVerificationController.text =
-                                verificationtext;
-                            // cleartext output
-                            outputController.text = new String.fromCharCodes(
-                                base64Decoding(plaintextBase64));
-                          } else {
-                            print("Formular ist nicht gültig");
+                          String signatureBase64 = '';
+                          try {
+                            ECPrivateKey ecPrivateKey = CryptoUtils.ecPrivateKeyFromPem(privateKeyPem);
+                            Uint8List messageByte = createUint8ListFromString(plaintext);
+                            signatureBase64 = ecSignToBase64(ecPrivateKey, messageByte);
+                          } catch (error) {
+                            outputController.text = 'Fehler beim Signieren';
+                            return;
                           }
-                        },
-                        child: Text('Signatur prüfen'),
-                      ),
+                          // build output string
+                          String _formdata = 'ECDSA P256 SHA1' +
+                              ':' +
+                              base64Encoding(
+                                  createUint8ListFromString(plaintext)) +
+                              ':' +
+                              signatureBase64;
+                          String jsonOutput = _returnJson(_formdata);
+                          outputController.text = jsonOutput;
+                        } else {
+                          print("Formular ist nicht gültig");
+                        }
+                      },
+                      child: Text('signieren'),
                     ),
                   ],
                 ),
 
                 SizedBox(height: 20),
                 TextFormField(
-                  controller: signatureVerificationController,
-                  maxLines: 1,
-                  enabled: false,
-                  decoration: InputDecoration(
-                    labelText: 'Gültigkeit der Signatur',
-                    hintText: 'Gültigkeit der Signatur',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-
-                SizedBox(height: 20),
-                TextFormField(
                   controller: outputController,
-                  maxLines: 3,
-                  maxLength: 100,
+                  maxLines: 15,
+                  maxLength: 700,
                   decoration: InputDecoration(
-                    labelText: 'Klartext',
-                    hintText: 'hier steht der KLartext',
+                    labelText: 'Ausgabe',
+                    hintText: 'Ausgabe',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -331,8 +315,8 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> 
                           await Clipboard.setData(data);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content:
-                              const Text('in die Zwischenablage kopiert'),
+                              content: const Text(
+                                  'Daten in die Zwischenablage kopiert'),
                             ),
                           );
                         },
@@ -349,22 +333,30 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> 
     );
   }
 
-  bool ecVerifySignatureFromBase64(
-      ECPublicKey publicKey, Uint8List messageByte, String signatureBase64) {
-    var signatureValue = base64Decoding(signatureBase64);
-    BigInt r = decodeBigInt(Uint8List.sublistView(signatureValue, 0, 32));
-    BigInt s = decodeBigInt(Uint8List.sublistView(signatureValue, 32, 64));
-    ECSignature signature = new ECSignature(r, s);
-    return CryptoUtils.ecVerify(publicKey, messageByte, signature,
-        algorithm: 'SHA-256/ECDSA');
+  String ecSignToBase64(ECPrivateKey privateKey, Uint8List messageByte) {
+    ECSignature ecSignature = CryptoUtils.ecSign(privateKey, messageByte,
+        algorithmName: 'SHA-1/ECDSA');
+    BigInt r = ecSignature.r;
+    BigInt s = ecSignature.s;
+    Uint8List rUint8ListV2 = encodeBigInt(r) as Uint8List;
+    Uint8List sUint8ListV2 = encodeBigInt(s) as Uint8List;
+    var bbV2 = BytesBuilder();
+    bbV2.add(rUint8ListV2);
+    bbV2.add(sUint8ListV2);
+    var signature = bbV2.toBytes();
+    return base64Encoding(signature);
   }
 
-  // http://phoenix.yizimg.com/ethereumdart/rlp/blob/master/lib/src/pointycastle-utils.dart
-  /// Decode a BigInt from bytes in big-endian encoding.
-  BigInt decodeBigInt(List<int> bytes) {
-    BigInt result = new BigInt.from(0);
-    for (int i = 0; i < bytes.length; i++) {
-      result += new BigInt.from(bytes[bytes.length - i - 1]) << (8 * i);
+  var _byteMask = new BigInt.from(0xff);
+
+  /// Encode a BigInt into bytes using big-endian encoding.
+  Uint8List encodeBigInt(BigInt number) {
+    // Not handling negative numbers. Decide how you want to do that.
+    int size = (number.bitLength + 7) >> 3;
+    var result = new Uint8List(size);
+    for (int i = 0; i < size; i++) {
+      result[size - i - 1] = (number & _byteMask).toInt();
+      number = number >> 8;
     }
     return result;
   }
@@ -377,7 +369,25 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> 
     return ret;
   }
 
-  Uint8List base64Decoding(String input) {
-    return base64.decode(input);
+  String base64Encoding(Uint8List input) {
+    return base64.encode(input);
   }
+}
+
+class JsonAsymmetricSignature {
+  JsonAsymmetricSignature({
+    required this.algorithm,
+    required this.plaintext,
+    required this.signature,
+  });
+
+  final String algorithm;
+  final String plaintext;
+  final String signature;
+
+  Map toJson() => {
+    'algorithm': algorithm,
+    'plaintext': plaintext,
+    'signature': signature,
+  };
 }

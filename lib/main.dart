@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/link.dart';
 import 'ec_p256_key_generation_route.dart';
+import 'ecdsa_p256_sha1_signature_route.dart';
+import 'ecdsa_p256_sha1_signature_verification_route.dart';
 import 'ecdsa_p256_sha256_signature_route.dart';
 import 'ecdsa_p256_sha256_signature_verification_route.dart';
 
@@ -160,6 +162,26 @@ class _MainFormPageState extends State<MainFormPage> {
                     }
                     ;
                     if (dropdownValue ==
+                        'ECDSA P256 SHA1\nSignatur') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                EcdsaP256Sha1SignatureRoute()),
+                      );
+                    }
+                    ;
+                    if (dropdownValue ==
+                        'ECDSA P256 SHA1\nVerifikation') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                EcdsaP256Sha1SignatureVerificationRoute()),
+                      );
+                    }
+                    ;
+                    if (dropdownValue ==
                         'EC P256 Schluessel\nGenerierung') {
                       Navigator.push(
                         context,
@@ -173,6 +195,8 @@ class _MainFormPageState extends State<MainFormPage> {
                     'Bitte wählen Sie einen Algorithmus',
                     'ECDSA P256 SHA256\nSignatur',
                     'ECDSA P256 SHA256\nVerifikation',
+                    'ECDSA P256 SHA1\nSignatur',
+                    'ECDSA P256 SHA1\nVerifikation',
                     'EC P256 Schluessel\nGenerierung',
                   ].map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
@@ -211,7 +235,7 @@ class _MainFormPageState extends State<MainFormPage> {
                               padding: const EdgeInsets.only(top: 20),
                               child: Text(
                                   'Die App demonstriert die Signatur mit'
-                                      ' dem EC Algorithmus mit dem Hash Algorithmus SHA-256.'
+                                      ' dem EC Algorithmus mit den Hash Algorithmen SHA-256 und SHA-1.'
                                       '\nDas EC Schlüsselpaar kann erzeugt und lokal gespeichert werden.'),
                             ),
                           ],

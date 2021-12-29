@@ -5,16 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'storage.dart';
 
-class EcdsaP256Sha256SignatureVerificationRoute extends StatefulWidget {
-  const EcdsaP256Sha256SignatureVerificationRoute({Key? key}) : super(key: key);
+class EcdsaP256Sha1SignatureVerificationRoute extends StatefulWidget {
+  const EcdsaP256Sha1SignatureVerificationRoute({Key? key}) : super(key: key);
 
-  final String title = 'ECDSA P256 SHA256 Verifikation';
+  final String title = 'ECDSA P256 SHA1 Verifikation';
 
   @override
   _MyFormPageState createState() => _MyFormPageState();
 }
 
-class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> {
+class _MyFormPageState extends State<EcdsaP256Sha1SignatureVerificationRoute> {
   @override
   void initState() {
     super.initState();
@@ -30,7 +30,7 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> 
   TextEditingController();
 
   String txtDescription =
-      'ECDSA P256 Verifikation einer Unterschrift mit SHA-256 hashing.'
+      'ECDSA P256 Verifikation einer Unterschrift mit SHA-1 hashing.'
       ' Der öffentliche Schlüssel ist im PEM PKCS#8 Format.';
 
   Future<bool> _fileExistsPublicKey() async {
@@ -248,9 +248,9 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> 
                               'Fehler: Die Eingabe ist ungültig.';
                               return;
                             }
-                            if (algorithm != 'ECDSA P256 SHA256') {
+                            if (algorithm != 'ECDSA P256 SHA1') {
                               outputController.text =
-                              'Fehler: es handelt sich nicht um einen Datensatz, der mit ECDSA P256 SHA-256 signiert worden ist.';
+                              'Fehler: es handelt sich nicht um einen Datensatz, der mit ECDSA P256 SHA-1 signiert worden ist.';
                               return;
                             }
                             String verificationtext = '';
@@ -356,7 +356,7 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureVerificationRoute> 
     BigInt s = decodeBigInt(Uint8List.sublistView(signatureValue, 32, 64));
     ECSignature signature = new ECSignature(r, s);
     return CryptoUtils.ecVerify(publicKey, messageByte, signature,
-        algorithm: 'SHA-256/ECDSA');
+        algorithm: 'SHA-1/ECDSA');
   }
 
   // http://phoenix.yizimg.com/ethereumdart/rlp/blob/master/lib/src/pointycastle-utils.dart
