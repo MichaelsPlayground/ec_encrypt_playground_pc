@@ -106,7 +106,7 @@ class _MainFormPageState extends State<MainFormPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  'Diese App demonstriert die asymmetrische Signatur auf Basis des EC Algorithmus.',
+                  'Diese App demonstriert die asymmetrische Signatur auf Basis des ECDSA Algorithmus.',
                   // 'This app is demonstrating the asymmetric signature on base of EC algorithm.',
                   style: Theme.of(context).textTheme.headline6,
                   textAlign: TextAlign.center,
@@ -142,7 +142,7 @@ class _MainFormPageState extends State<MainFormPage> {
                       dropdownValue = newValue!;
                     });
                     if (dropdownValue ==
-                        'ECDSA P256 SHA256\nSignatur') {
+                        'ECDSA curve P-256 SHA-256\nSignatur') {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -152,7 +152,7 @@ class _MainFormPageState extends State<MainFormPage> {
                     }
                     ;
                     if (dropdownValue ==
-                        'ECDSA P256 SHA256\nVerifikation') {
+                        'ECDSA curve P-256 SHA-256\nVerifikation') {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -162,7 +162,7 @@ class _MainFormPageState extends State<MainFormPage> {
                     }
                     ;
                     if (dropdownValue ==
-                        'ECDSA P256 SHA1\nSignatur') {
+                        'ECDSA curve P-256 SHA-1\nSignatur') {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -172,7 +172,7 @@ class _MainFormPageState extends State<MainFormPage> {
                     }
                     ;
                     if (dropdownValue ==
-                        'ECDSA P256 SHA1\nVerifikation') {
+                        'ECDSA curve P-256 SHA-1\nVerifikation') {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -182,7 +182,7 @@ class _MainFormPageState extends State<MainFormPage> {
                     }
                     ;
                     if (dropdownValue ==
-                        'EC P256 Schluessel\nGenerierung') {
+                        'EC curve P-256 Schluessel\nGenerierung') {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -193,11 +193,11 @@ class _MainFormPageState extends State<MainFormPage> {
                   },
                   items: <String>[
                     'Bitte wählen Sie einen Algorithmus',
-                    'ECDSA P256 SHA256\nSignatur',
-                    'ECDSA P256 SHA256\nVerifikation',
-                    'ECDSA P256 SHA1\nSignatur',
-                    'ECDSA P256 SHA1\nVerifikation',
-                    'EC P256 Schluessel\nGenerierung',
+                    'ECDSA curve P-256 SHA-1\nSignatur',
+                    'ECDSA curve P-256 SHA-1\nVerifikation',
+                    'ECDSA curve P-256 SHA-256\nSignatur',
+                    'ECDSA curve P-256 SHA-256\nVerifikation',
+                    'EC curve P-256 Schluessel\nGenerierung',
                   ].map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
@@ -217,7 +217,7 @@ class _MainFormPageState extends State<MainFormPage> {
                         // own license
                         LicenseRegistry.addLicense(() async* {
                           yield LicenseEntryWithLineBreaks(
-                            ['FlutterCrypto EC Signature Playgound'],
+                            ['FlutterCrypto ECDSA Signature Playgound'],
                             'Das Programm unterliegt keiner Lizenz und kann frei verwendet werden (Public Domain).',
                           );
                         });
@@ -235,7 +235,7 @@ class _MainFormPageState extends State<MainFormPage> {
                               padding: const EdgeInsets.only(top: 20),
                               child: Text(
                                   'Die App demonstriert die Signatur mit'
-                                      ' dem EC Algorithmus mit den Hash Algorithmen SHA-256 und SHA-1.'
+                                      ' dem ECDSA Algorithmus mit den Hashes SHA-1 und SHA-256.'
                                       '\nDas EC Schlüsselpaar kann erzeugt und lokal gespeichert werden.'),
                             ),
                           ],

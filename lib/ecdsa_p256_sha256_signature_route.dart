@@ -9,7 +9,7 @@ import 'storage.dart';
 class EcdsaP256Sha256SignatureRoute extends StatefulWidget {
   const EcdsaP256Sha256SignatureRoute({Key? key}) : super(key: key);
 
-  final String title = 'ECDSA P256 SHA256 Signatur';
+  final String title = 'ECDSA P-256 SHA-256 Signatur';
 
   @override
   _MyFormPageState createState() => _MyFormPageState();
@@ -31,7 +31,7 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureRoute> {
   TextEditingController privateKeyController = TextEditingController();
   TextEditingController outputController = TextEditingController();
 
-  String txtDescription = 'ECDSA P256 Signatur mit SHA-256 Hashing.'
+  String txtDescription = 'ECDSA Signatur mit curve P-256 und SHA-256 hashing.'
       ' Der private Schlüssel ist im PEM PKCS#8 Format.';
 
   String _returnJson(String data) {
@@ -262,7 +262,7 @@ class _MyFormPageState extends State<EcdsaP256Sha256SignatureRoute> {
                             return;
                           }
                           // build output string
-                          String _formdata = 'ECDSA P256 SHA256' +
+                          String _formdata = 'ECDSA curve P-256 SHA-256' +
                               ':' +
                               base64Encoding(
                                   createUint8ListFromString(plaintext)) +

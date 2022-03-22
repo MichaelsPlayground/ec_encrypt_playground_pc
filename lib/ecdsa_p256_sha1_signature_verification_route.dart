@@ -8,7 +8,7 @@ import 'storage.dart';
 class EcdsaP256Sha1SignatureVerificationRoute extends StatefulWidget {
   const EcdsaP256Sha1SignatureVerificationRoute({Key? key}) : super(key: key);
 
-  final String title = 'ECDSA P256 SHA1 Verifikation';
+  final String title = 'ECDSA P-256 SHA-1 Verifikation';
 
   @override
   _MyFormPageState createState() => _MyFormPageState();
@@ -30,7 +30,7 @@ class _MyFormPageState extends State<EcdsaP256Sha1SignatureVerificationRoute> {
   TextEditingController();
 
   String txtDescription =
-      'ECDSA P256 Verifikation einer Unterschrift mit SHA-1 hashing.'
+      'ECDSA Verifikation einer Unterschrift mit curve P-256 und SHA-1 hashing.'
       ' Der öffentliche Schlüssel ist im PEM PKCS#8 Format.';
 
   Future<bool> _fileExistsPublicKey() async {
@@ -248,9 +248,9 @@ class _MyFormPageState extends State<EcdsaP256Sha1SignatureVerificationRoute> {
                               'Fehler: Die Eingabe ist ungültig.';
                               return;
                             }
-                            if (algorithm != 'ECDSA P256 SHA1') {
+                            if (algorithm != 'ECDSA curve P-256 SHA-1') {
                               outputController.text =
-                              'Fehler: es handelt sich nicht um einen Datensatz, der mit ECDSA P256 SHA-1 signiert worden ist.';
+                              'Fehler: es handelt sich nicht um einen Datensatz, der mit ECDSA curve P-256 SHA-1 signiert worden ist.';
                               return;
                             }
                             String verificationtext = '';
