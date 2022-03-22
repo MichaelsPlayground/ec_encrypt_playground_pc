@@ -79,7 +79,7 @@ class _MainFormPageState extends State<MainFormPage> {
       child: Text(
         'Verwendete Kryptographie Bibliothek:'
         //'Used crypto library:'
-            '\nPointyCastle Version 3.4.0'
+            '\nPointyCastle Version 3.5.2'
             '\nhttps://pub.dev/packages/pointycastle',
         style: TextStyle(
           fontSize: 18,
